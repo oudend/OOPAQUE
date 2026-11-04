@@ -1,17 +1,31 @@
 package org.example;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
-public class Main {
-    static void main() {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        IO.println(String.format("Hello and welcome!"));
+import static com.raylib.Colors.*;
+import static com.raylib.Raylib.*;
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            IO.println("i = " + i);
+public class Main {
+    public static void main(String args[]) {
+        InitWindow(800, 450, "Demo");
+        SetTargetFPS(60);
+        Camera3D camera = new Camera3D()
+                ._position(new Vector3().x(18).y(16).z(18))
+                .target(new Vector3())
+                .up(new Vector3().x(0).y(1).z(0))
+                .fovy(45).projection(CAMERA_PERSPECTIVE);
+        // Add this line only if Raylib version < 4.5:
+        // SetCameraMode(camera, CAMERA_ORBITAL);
+
+        while (!WindowShouldClose()) {
+            UpdateCamera(camera, CAMERA_ORBITAL);
+            BeginDrawing();
+            ClearBackground(RAYWHITE);
+            BeginMode3D(camera);
+            DrawGrid(20, 1.0f);
+            EndMode3D();
+            DrawText("Hello world", 190, 200, 20, VIOLET);
+            DrawFPS(20, 20);
+            EndDrawing();
         }
+        CloseWindow();
     }
 }
