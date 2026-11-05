@@ -5,24 +5,37 @@ import static com.raylib.Raylib.*;
 
 public class Main {
     public static void main(String args[]) {
-        InitWindow(800, 450, "Demo");
-        SetTargetFPS(60);
-        Camera3D camera = new Camera3D()
-                ._position(new Vector3().x(18).y(16).z(18))
-                .target(new Vector3())
-                .up(new Vector3().x(0).y(1).z(0))
-                .fovy(45).projection(CAMERA_PERSPECTIVE);
-        // Add this line only if Raylib version < 4.5:
-        // SetCameraMode(camera, CAMERA_ORBITAL);
+        int width = 80, height = 45;
+        int scale = 10;
+        InitWindow(width * scale, height * scale, "OOPaque");
 
+        Color[][] canvas = new Color[width][height];
+        for (int i = 0; i < width; i++)
+            for (int j = 0; j < height; j++)
+                canvas[i][j] = RAYWHITE;
+
+        Color penColor = BLACK;
+
+        SetTargetFPS(60);
         while (!WindowShouldClose()) {
-            UpdateCamera(camera, CAMERA_ORBITAL);
             BeginDrawing();
             ClearBackground(RAYWHITE);
-            BeginMode3D(camera);
-            DrawGrid(20, 1.0f);
-            EndMode3D();
-            DrawText("Hello world", 190, 200, 20, VIOLET);
+            for (int i = 0; i < width; i++)
+                for (int j = 0; j < height; j++) {
+                    DrawRectangle(i * scale, j * scale, scale, scale, canvas[i][j]);
+                    System.out.println(canvas[i][j]);
+                }
+
+            if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+                int xPos = Math.max(Math.min(GetMouseX() / scale, width), 0);
+                int yPos = Math.max(Math.min(GetMouseY() / scale, height), 0);
+                canvas[xPos][yPos] = penColor;
+            }
+
+            if (IsKeyDown(KEY_SPACE))
+                for (int i = 0; i < width; i++)
+                    for (int j = 0; j < height; j++)
+                        canvas[i][j] = RAYWHITE;
             DrawFPS(20, 20);
             EndDrawing();
         }
