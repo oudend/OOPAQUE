@@ -3,61 +3,72 @@ package org.example;
 import static com.raylib.Colors.*;
 import static com.raylib.Raylib.*;
 
+import com.raylib.Raylib;
 import com.raylib.Raylib.Color;
 import com.raylib.Raylib.Image;
 import com.raylib.Raylib.Texture;
 import com.raylib.Raylib.Vector2;
-import java.util.ArrayList;
 
 public class Main {
+
   public static void main(String args[]) {
-    int width = 160, height = 90;
-    int scale = 10;
-    InitWindow(width * scale, height * scale, "OOPaque");
+    int screenWidth = 1600, screenHeight = 900;
+//    int scale = 10;
+    InitWindow(screenWidth, screenHeight, "OOPaque");
 
-    Color[][] canvas = new Color[width][height];
-    for (int i = 0; i < width; i++) for (int j = 0; j < height; j++) canvas[i][j] = RAYWHITE;
+    int drawRadius = 10;
 
-    Color penColor = BLACK;
+    Color selectedColor = BLACK;
 
-    ArrayList<Vector2> previewPositions = new ArrayList<>();
+    Color eraseColor = RAYWHITE; // ColorAlpha(BLACK, 0.0f);
 
-    Image img = GenImageColor(width * scale, height * scale, RAYWHITE);
-    Texture h = LoadTextureFromImage(img);
+    Color currentColor = selectedColor;
 
-    DrawFPS(20, 20);
+    Vector2 previousPosition = null;
 
-    SetTargetFPS(60);
+    RenderTexture canvas = LoadRenderTexture(screenWidth, screenHeight);
+//    SetTextureFilter(canvas, TEXTURE_FILTER_POINT);
+
+    //    SetTargetFPS(60);
     while (!WindowShouldClose()) {
-      BeginDrawing();
-
-      ClearBackground(RAYWHITE);
+      if (IsKeyDown(KEY_LEFT_SHIFT)) {
+        currentColor = eraseColor;
+      } else {
+        currentColor = selectedColor;
+      }
 
       if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+        Vector2 currentPosition = GetMousePosition();
 
-        previewPositions.add(GetMousePosition());
+        if (previousPosition == null) previousPosition = currentPosition;
 
-        if (previewPositions.size() > 1) {
-          ImageDrawLineEx(img, previewPositions.get(0), previewPositions.get(1), 20, penColor);
-          previewPositions.remove(0);
+        if (Vector2Distance(currentPosition, previousPosition) < drawRadius / 2.0f) {
+          BeginTextureMode(canvas);
+            DrawCircleV(currentPosition, drawRadius, currentColor);
+          EndTextureMode();
+        } else {
+          BeginTextureMode(canvas);
+            DrawCircleV(previousPosition, drawRadius, currentColor);
+            DrawCircleV(GetMousePosition(), drawRadius, currentColor);
+            DrawLineEx(previousPosition, currentPosition, drawRadius * 2.0f, currentColor);
+          EndTextureMode();
         }
+
+        previousPosition = currentPosition;
       }
 
-      if (IsMouseButtonUp(MOUSE_BUTTON_LEFT)) {
-        if (previewPositions.size() > 1) {
+      if(IsMouseButtonUp(MOUSE_BUTTON_LEFT)) previousPosition = null;
 
-          for (int i = 1; i < previewPositions.size(); i++)
-            ImageDrawLineEx(
-                img, previewPositions.get(i - 1), previewPositions.get(i), 20, penColor);
-        }
-        previewPositions.clear();
-      }
-
-      UpdateTexture(h, img.data());
-      DrawTexture(h, 0, 0, WHITE);
+      BeginDrawing();
+      ClearBackground(RAYWHITE);
+      Rectangle rect = new Rectangle().x(0.0f).y(0.0f).width((float)canvas.texture().width()).height((float)-canvas.texture().height());
+      DrawTextureRec(canvas.texture(), rect, Vector2Zero(), WHITE);
+//      DrawTexture(canvas.texture(), 0, 0, WHITE);
+      DrawFPS(20, 20);
       EndDrawing();
     }
 
+    UnloadRenderTexture(canvas);
     CloseWindow();
   }
 }
