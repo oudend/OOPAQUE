@@ -1,0 +1,14 @@
+#!/bin/sh
+
+echo "Checking Java formatting..."
+
+./mvnw spotless:apply || exit 1
+./mvnw spotless:check || exit 1
+
+if ! git diff --quiet; then
+    echo "Formatting changes detected."
+    echo "Please stage and commit the changes again."
+    exit 1
+fi
+
+echo "Formatting check passed!"
