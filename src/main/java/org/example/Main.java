@@ -24,14 +24,12 @@ public class Main {
         Color penColor = BLACK;
 
         ArrayList<Vector2> previewPositions = new ArrayList<>();
-        ArrayList<Vector2> drawnPositions = new ArrayList<>();
 
         Image img = GenImageColor(width * scale, height * scale, RAYWHITE);
         Texture h = LoadTextureFromImage(img);
 
-        boolean mouseButtonHeld = false;
-
         DrawFPS(20, 20);
+
         SetTargetFPS(60);
         while (!WindowShouldClose()) {
             BeginDrawing();
@@ -39,18 +37,23 @@ public class Main {
             ClearBackground(RAYWHITE);
 
             if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-                mouseButtonHeld = true;
 
                 previewPositions.add(GetMousePosition());
 
-            } else if (mouseButtonHeld) {
-                mouseButtonHeld = false;
+                if (previewPositions.size() > 1) {
+                    ImageDrawLineEx(img, previewPositions.get(0), previewPositions.get(1), 20, penColor);
+                    previewPositions.remove(0);
+                }
+
+            }
+
+            if (IsMouseButtonUp(MOUSE_BUTTON_LEFT)) {
                 if (previewPositions.size() > 1) {
 
                     for (int i = 1; i < previewPositions.size(); i++)
                         ImageDrawLineEx(img, previewPositions.get(i - 1), previewPositions.get(i), 20, penColor);
-                    previewPositions.clear();
                 }
+                previewPositions.clear();
             }
 
             UpdateTexture(h, img.data());
@@ -58,6 +61,7 @@ public class Main {
             EndDrawing();
 
         }
+
         CloseWindow();
     }
 }
