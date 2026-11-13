@@ -6,11 +6,7 @@ public class Brush implements Tool {
 
   private Canvas canvas;
   private int radius;
-
-  private Integer previousX;
-  private Integer previousY;
-
-  private boolean pointerDown = false;
+  private MouseTracker mouseTracker = new MouseTracker();
 
   public Brush(Canvas canvas, int radius) {
     this.canvas = canvas;
@@ -19,30 +15,23 @@ public class Brush implements Tool {
 
   @Override
   public void onPointerDown(int x, int y) {
-    pointerDown = true;
-
-    previousX = x;
-    previousY = y;
+    mouseTracker.start(x, y);
   }
 
   @Override
   public void onPointerMove(int x, int y) {
-    if (!pointerDown) return;
+    if (!mouseTracker.isPointerDown()) return;
 
     canvas.drawCircle(x, y, radius);
-    canvas.drawLine(previousX, previousY, x, y, radius * 2.0f);
-    canvas.drawCircle(previousX, previousY, radius);
+    canvas.drawLine(mouseTracker.getPreviousX(), mouseTracker.getPreviousY(), x, y, radius * 2.0f);
+    canvas.drawCircle(mouseTracker.getPreviousX(), mouseTracker.getPreviousY(), radius);
 
-    previousX = x;
-    previousY = y;
+    mouseTracker.move(x, y);
   }
 
   @Override
   public void onPointerUp() {
-    pointerDown = false;
-
-    previousX = null;
-    previousY = null;
+    mouseTracker.end();
   }
 
   @Override
