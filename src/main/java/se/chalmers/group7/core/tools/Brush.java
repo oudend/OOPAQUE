@@ -1,6 +1,9 @@
 package se.chalmers.group7.core.tools;
 
-import se.chalmers.group7.core.Canvas;
+import static com.raylib.Colors.BLACK;
+
+import se.chalmers.group7.core.canvas.BlendingMode;
+import se.chalmers.group7.core.canvas.Canvas;
 
 public class Brush implements Tool {
 
@@ -21,6 +24,8 @@ public class Brush implements Tool {
   public void onPointerDown(int x, int y) {
     pointerDown = true;
 
+    canvas.drawCircle(x, y, radius, BLACK, BlendingMode.NORMAL);
+
     previousX = x;
     previousY = y;
   }
@@ -29,9 +34,9 @@ public class Brush implements Tool {
   public void onPointerMove(int x, int y) {
     if (!pointerDown) return;
 
-    canvas.drawCircle(x, y, radius);
-    canvas.drawLine(previousX, previousY, x, y, radius * 2.0f);
-    canvas.drawCircle(previousX, previousY, radius);
+    canvas.drawCircle(x, y, radius, BLACK, BlendingMode.NORMAL);
+    canvas.drawLine(previousX, previousY, x, y, radius * 2.0f, BLACK, BlendingMode.NORMAL);
+    canvas.drawCircle(previousX, previousY, radius, BLACK, BlendingMode.NORMAL);
 
     previousX = x;
     previousY = y;
